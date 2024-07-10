@@ -131,13 +131,19 @@ class PGPPublicKeyFieldMixin(PGPMixin):
     decrypt_sql = PGP_PUB_DECRYPT_SQL
     cast_type = 'TEXT'
 
+    def __init__(self, public_key=None, private_key=None, *args, **kwargs):
+        self.public_key = public_key
+        self.private_key = private_key
+
+        super().__init__(*args, **kwargs)
+
     def get_placeholder(self, value=None, compiler=None, connection=None):
         """Tell postgres to encrypt this field using PGP."""
-        return self.encrypt_sql.format(get_setting(connection, 'PUBLIC_PGP_KEY'))
+        return self.encrypt_sql.format(self.public_key or get_setting(connection, 'PUBLIC_PGP_KEY'))
 
     def get_decrypt_sql(self, connection):
         """Get decrypt sql."""
-        return self.decrypt_sql.format(get_setting(connection, 'PRIVATE_PGP_KEY'))
+        return self.decrypt_sql.format(self.private_key or get_setting(connection, 'PRIVATE_PGP_KEY'))
 
 
 class PGPSymmetricKeyFieldMixin(PGPMixin):
@@ -146,13 +152,18 @@ class PGPSymmetricKeyFieldMixin(PGPMixin):
     decrypt_sql = PGP_SYM_DECRYPT_SQL
     cast_type = 'TEXT'
 
+    def __init__(self, symmetric_key=None, *args, **kwargs):
+        self.symmetric_key = symmetric_key
+
+        super().__init__(*args, **kwargs)
+
     def get_placeholder(self, value, compiler, connection):
         """Tell postgres to encrypt this field using PGP."""
-        return self.encrypt_sql.format(get_setting(connection, 'PGCRYPTO_KEY'))
+        return self.encrypt_sql.format(self.symmetric_key or get_setting(connection, 'PGCRYPTO_KEY'))
 
     def get_decrypt_sql(self, connection):
         """Get decrypt sql."""
-        return self.decrypt_sql.format(get_setting(connection, 'PGCRYPTO_KEY'))
+        return self.decrypt_sql.format(self.symmetric_key or get_setting(connection, 'PGCRYPTO_KEY'))
 
 
 class DecimalPGPFieldMixin:
