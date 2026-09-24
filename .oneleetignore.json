@@ -1,0 +1,11 @@
+{
+  "$schema": "https://docs.oneleet.com/code-security/oneleetignore.schema.json",
+  "version": 1,
+  "ignores": [
+    {
+      "ruleIds": ["private-key"],
+      "pathPatterns": ["/tests/keys/**"],
+      "reason": "Upstream test keys. tests/keys/private.key and tests/keys/private_diff.key ship with the original django-pgcrypto-fields test suite and this fork keeps them unchanged. They exist so the library's unit tests can encrypt and decrypt their fixtures; they protect no Infinia data. Reviewed 2026-09-05."
+    }
+  ]
+}
